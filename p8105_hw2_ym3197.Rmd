@@ -1,0 +1,155 @@
+---
+title: "p8105_hw2_ym3197"
+author: "Yichaun Ma"
+date: "2026-10-06"
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+
+nyc_transit <- read_csv("data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv", na = c("NA", "", "."))
+
+
+
+dim(nyc_transit)
+
+
+nyc_clean <- nyc_transit |> 
+  rename_with(~ str_replace_all(tolower(.), " ", "_")) |> 
+  select(
+    line,
+    station_name,
+    station_latitude,
+    station_longitude,
+    starts_with("route"), 
+    entrance_type,
+    entry,
+    vending,
+    ada
+  ) |> 
+  mutate(
+    
+    entry = case_match(
+      entry,
+      "YES" ~ TRUE,
+      "NO" ~ FALSE,
+      .default = NA
+    ),
+ 
+    across(starts_with("route"), as.character)
+  )
+
+
+
+dim(nyc_clean)
+print("Entry variable conversion check:")
+table(nyc_clean$entry, useNA = "ifany")
+```
+
+```{r}
+
+distinct_stations <- nyc_clean |> 
+  distinct(station_name, line) |> 
+  nrow()
+print(paste("1. Number of distinct stations:", distinct_stations))
+
+ada_stations <- nyc_clean |> 
+  filter(ada == TRUE) |> 
+  distinct(station_name, line) |> 
+  nrow()
+print(paste("2. Number of ADA compliant stations:", ada_stations))
+
+
+total_no_vending <- nyc_clean |> 
+  filter(vending == "NO") |> 
+  nrow()
+print(paste("   Total entrances without vending (denominator):", total_no_vending))
+
+no_vending_entry <- nyc_clean |> 
+  filter(vending == "NO", entry == TRUE) |> 
+  nrow()
+print(paste("   Entrances without vending that allow entry (numerator):", no_vending_entry))
+
+proportion_no_vending <- no_vending_entry / total_no_vending
+print(paste("3. Proportion:", round(proportion_no_vending, 4)))
+
+```
+
+```{r}
+
+nyc_long <- nyc_clean |> 
+  pivot_longer(
+    cols = starts_with("route"),
+    names_to = "route_number",
+    values_to = "route",
+    values_drop_na = TRUE
+  ) |> 
+  mutate(route = str_trim(route))
+
+
+
+dim(nyc_long)
+
+
+a_train_stations <- nyc_long |> 
+  filter(route == "A") |> 
+  distinct(station_name, line) |> 
+  nrow()
+print(paste("4. Number of distinct stations served by A train:", a_train_stations))
+
+
+a_train_ada <- nyc_long |> 
+  filter(route == "A", ada == TRUE) |> 
+  distinct(station_name, line) |> 
+  nrow()
+print(paste("5. A train stations that are ADA compliant:", a_train_ada))
+```
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+
+```{r}
+
+```
+
+
+
+
+```{r}
+
+```
+
+
+
+```{r}
+
+```
+
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+
+```{r}
+
+```
