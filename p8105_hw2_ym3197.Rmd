@@ -8,7 +8,7 @@ output: github_document
 ```{r}
 library(tidyverse)
 ```
-
+problem1
 ```{r}
 
 nyc_transit <- read_csv("data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv", na = c("NA", "", "."))
@@ -108,13 +108,175 @@ a_train_ada <- nyc_long |>
   nrow()
 print(paste("5. A train stations that are ADA compliant:", a_train_ada))
 ```
+problem 2
 
+read and clean data
 ```{r}
+# Problem 2
+
+
+mr_trash_wheel =
+  readxl::read_excel(
+    "data/202610 Trash Wheel Collection Data.xlsx",
+    sheet = "Mr. Trash Wheel",
+    range = "A2:N1000"
+  ) |>
+  janitor::clean_names() |>
+  drop_na(dumpster) |>
+  mutate(
+    year = as.numeric(year),
+    month = str_trim(month),
+    sports_balls = as.integer(round(sports_balls)),
+    trash_wheel = "Mr. Trash Wheel"
+  )
+
+```
+
+read and clean data
+```{r}
+professor_trash_wheel =
+  readxl::read_excel(
+    "data/202610 Trash Wheel Collection Data.xlsx",
+    sheet = "Professor Trash Wheel",
+    range = "A2:M1000"
+  ) |>
+  janitor::clean_names() |>
+  drop_na(dumpster) |>
+  mutate(
+    year = as.numeric(year),
+    month = str_trim(month),
+    trash_wheel = "Professor Trash Wheel"
+  )
 
 ```
 
 
+
+read and clean data
 ```{r}
+gwynnda =
+  readxl::read_excel(
+    "data/202610 Trash Wheel Collection Data.xlsx",
+    sheet = "Gwynnda the Good Wheel of the W",
+    range = "A2:L1000"
+  ) |>
+  janitor::clean_names() |>
+  drop_na(dumpster) |>
+  mutate(
+    year = as.numeric(year),
+    month = str_trim(month),
+    trash_wheel = "Gwynnda"
+  )
+```
+
+
+
+```{r}
+mr_trash_wheel =
+  mr_trash_wheel |>
+  mutate(
+    across(
+      any_of(c(
+        "year",
+        "weight_tons",
+        "volume_cubic_yards",
+        "plastic_bottles",
+        "polystyrene",
+        "cigarette_butts",
+        "plastic_bags",
+        "wrappers",
+        "homes_powered"
+      )),
+      as.numeric
+    )
+  )
+
+professor_trash_wheel =
+  professor_trash_wheel |>
+  mutate(
+    across(
+      any_of(c(
+        "year",
+        "weight_tons",
+        "volume_cubic_yards",
+        "plastic_bottles",
+        "polystyrene",
+        "cigarette_butts",
+        "plastic_bags",
+        "wrappers",
+        "homes_powered"
+      )),
+      as.numeric
+    )
+  )
+
+gwynnda =
+  gwynnda |>
+  mutate(
+    across(
+      any_of(c(
+        "year",
+        "weight_tons",
+        "volume_cubic_yards",
+        "plastic_bottles",
+        "polystyrene",
+        "cigarette_butts",
+        "plastic_bags",
+        "wrappers",
+        "homes_powered"
+      )),
+      as.numeric
+    )
+  )
+```
+
+
+combined three data
+```{r}
+
+trash_wheel_df =
+  bind_rows(
+    mr_trash_wheel,
+    professor_trash_wheel,
+    gwynnda
+  )
+
+nrow(trash_wheel_df)
+
+trash_wheel_df =
+  bind_rows(
+    mr_trash_wheel,
+    professor_trash_wheel,
+    gwynnda
+  )
+
+
+trash_wheel_df
+
+nrow(trash_wheel_df)
+
+names(trash_wheel_df)
+
+professor_trash_wheel |>
+  summarize(
+    total_weight = sum(weight_tons, na.rm = TRUE)
+  )
+```
+ 
+
+total cigaretee butts collected by Gwynnda in June 2022
+```{r}
+gwynnda |>
+  filter(
+    year == 2022,
+    month == "June"
+  ) |>
+  summarize(
+    total_cigarettes = sum(cigarette_butts, na.rm = TRUE)
+  )
+
+
+
 
 ```
 
