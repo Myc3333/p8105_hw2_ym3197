@@ -280,10 +280,207 @@ gwynnda |>
 
 ```
 
+Problem 3
+
+Import and clean baseline demographics
+```{r}
+
+mci_baseline =
+  read_csv(
+    "data/data_mci/MCI_baseline.csv",
+    skip = 1,
+    na = c("NA", ".")
+  ) |>
+  janitor::clean_names() |>
+  filter(
+    is.na(age_at_onset) | age_at_onset > current_age
+  ) |>
+  mutate(
+    sex = case_match(
+      sex,
+      0 ~ "female",
+      1 ~ "male"
+    ),
+    apoe4 = case_match(
+      apoe4,
+      0 ~ "non-carrier",
+      1 ~ "carrier"
+    )
+  )
+
+```
+
+
+```{r}
+# Number of participants recruited
+
+
+nrow(mci_baseline)
+
+```
+
+```{r}
+# Number of participants who developed MCI
+
+mci_baseline |>
+  filter(!is.na(age_at_onset)) |>
+  nrow()
+```
 
 
 ```{r}
 
+# Average baseline age
+
+mci_baseline |>
+  summarize(
+    mean_age = mean(current_age, na.rm = TRUE)
+  )
+```
+
+
+```{r}
+
+# Proportion of female APOE4 carriers
+
+mci_baseline |>
+  filter(sex == "female") |>
+  summarize(
+    female_apoe4_proportion = mean(apoe4 == "carrier")
+  )
+```
+
+
+```{r}
+
+# Import and clean amyloid data
+
+mci_amyloid =
+  read_csv(
+    "data/data_mci/mci_amyloid.csv",
+    skip = 1,
+    na = c("NA", "")
+  ) |>
+  janitor::clean_names() |>
+  rename(
+    id = study_id,
+    time_0 = baseline
+  ) |>
+  pivot_longer(
+    time_0:time_8,
+    names_to = "time",
+    values_to = "amyloid"
+  ) |>
+  mutate(
+    time = case_match(
+      time,
+      "time_0" ~ 0,
+      "time_2" ~ 2,
+      "time_4" ~ 4,
+      "time_6" ~ 6,
+      "time_8" ~ 8
+    )
+  )
+```
+
+
+```{r}
+
+# Number of participants in amyloid dataset
+
+mci_amyloid |>
+  distinct(id) |>
+  nrow()
+```
+
+```{r}
+
+# Participants only in baseline dataset
+
+baseline_only =
+  anti_join(
+    mci_baseline,
+    mci_amyloid,
+    by = "id"
+  )
+
+nrow(baseline_only)
+```
+
+
+```{r}
+
+# Participants only in amyloid dataset
+
+amyloid_only =
+  anti_join(
+    mci_amyloid,
+    mci_baseline,
+    by = "id"
+  )
+
+amyloid_only |>
+  distinct(id) |>
+  nrow()
+```
+
+
+```{r}
+
+# Number of amyloid-only observations
+
+nrow(amyloid_only)
+```
+
+```{r}
+
+# Combine baseline and amyloid datasets
+
+mci_complete =
+  inner_join(
+    mci_baseline,
+    mci_amyloid,
+    by = "id"
+  )
+
+```
+
+```{r}
+# Number of participants in combined dataset
+
+mci_complete |>
+  distinct(id) |>
+  nrow()
+```
+
+
+```{r}
+
+# Number of observations in combined dataset
+
+nrow(mci_complete)
+```
+
+```{r}
+
+# View combined dataset
+
+mci_complete
+
+names(mci_complete)
+```
+
+
+
+
+```{r}
+
+# Export combined dataset
+
+write_csv(
+  mci_complete,
+  "data/data_mci/mci_complete.csv"
+)
 ```
 
 
