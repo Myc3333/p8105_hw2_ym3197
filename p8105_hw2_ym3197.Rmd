@@ -310,27 +310,22 @@ mci_baseline =
 
 ```
 
-
+Number of participants recruited
 ```{r}
-# Number of participants recruited
-
-
 nrow(mci_baseline)
 
 ```
-
+Number of participants who developed MCI
 ```{r}
-# Number of participants who developed MCI
+
 
 mci_baseline |>
   filter(!is.na(age_at_onset)) |>
   nrow()
 ```
 
-
+Average baseline age
 ```{r}
-
-# Average baseline age
 
 mci_baseline |>
   summarize(
@@ -338,10 +333,8 @@ mci_baseline |>
   )
 ```
 
-
+Proportion of female APOE4 carriers
 ```{r}
-
-# Proportion of female APOE4 carriers
 
 mci_baseline |>
   filter(sex == "female") |>
@@ -350,10 +343,9 @@ mci_baseline |>
   )
 ```
 
-
+this is import and clean amyloid data
 ```{r}
 
-# Import and clean amyloid data
 
 mci_amyloid =
   read_csv(
@@ -383,19 +375,15 @@ mci_amyloid =
   )
 ```
 
-
+Number of participants in amyloid dataset
 ```{r}
-
-# Number of participants in amyloid dataset
 
 mci_amyloid |>
   distinct(id) |>
   nrow()
 ```
-
+Participants only in baseline dataset
 ```{r}
-
-# Participants only in baseline dataset
 
 baseline_only =
   anti_join(
@@ -407,10 +395,9 @@ baseline_only =
 nrow(baseline_only)
 ```
 
-
+Participants only in amyloid dataset
 ```{r}
 
-# Participants only in amyloid dataset
 
 amyloid_only =
   anti_join(
@@ -424,17 +411,13 @@ amyloid_only |>
   nrow()
 ```
 
-
+Number of amyloid-only observations
 ```{r}
-
-# Number of amyloid-only observations
 
 nrow(amyloid_only)
 ```
-
+Combine baseline and amyloid datasets
 ```{r}
-
-# Combine baseline and amyloid datasets
 
 mci_complete =
   inner_join(
@@ -444,26 +427,21 @@ mci_complete =
   )
 
 ```
-
+Number of participants in combined dataset
 ```{r}
-# Number of participants in combined dataset
 
 mci_complete |>
   distinct(id) |>
   nrow()
 ```
 
-
+Number of observations in combined dataset
 ```{r}
-
-# Number of observations in combined dataset
-
 nrow(mci_complete)
 ```
 
+View combined dataset
 ```{r}
-
-# View combined dataset
 
 mci_complete
 
@@ -472,10 +450,8 @@ names(mci_complete)
 
 
 
-
+Export combined dataset
 ```{r}
-
-# Export combined dataset
 
 write_csv(
   mci_complete,
